@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">DatingApp</string>
     <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
-    <string name="facebook_application_id" translatable="false">FACEBOOK_APP_ID</string>
-    <string name="facebook_login_protocol_scheme" translatable="false">fbFACEBOOK_APP_ID</string>
+    <string name="facebook_application_id" translatable="false">2222505084670648</string>
+    <string name="facebook_login_protocol_scheme" translatable="false">fb2222505084670648</string>
+
+    <!--Status-->
+    <string name="loading">Loading…</string>
 
     <!--Login Activity-->
     <string name="login_activity_email_label">Email</string>
