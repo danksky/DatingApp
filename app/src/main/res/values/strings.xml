@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">DatingApp</string>
+    <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
+    <string name="facebook_application_id" translatable="false">FACEBOOK_APP_ID</string>
+    <string name="facebook_login_protocol_scheme" translatable="false">fbFACEBOOK_APP_ID</string>
+
+    <!--Login Activity-->
+    <string name="login_activity_email_label">Email</string>
+    <string name="login_activity_password_label">Password</string>
+    <string name="login_activity_sign_in">Sign In</string>
+    <string name="login_activity_sign_out">Sign Out</string>
+
+    <string name="login_activity_status_auth_failed">Authentication failed</string>
+    <string name="login_activity_status_signed_in">Signed In</string>
+    <string name="login_activity_status_signed_out">Signed Out</string>
+
+    <string name="emailpassword_status_format">Email User: %1$s (verified: %2$b)</string>
+    <string name="firebase_status_format">Firebase User: %s</string>
+
+
 </resources>
