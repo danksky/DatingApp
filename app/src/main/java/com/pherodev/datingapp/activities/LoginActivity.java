@@ -72,7 +72,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onSuccess(LoginResult loginResult) {
                 Log.d(TAG, "facebook:onSuccess:" + loginResult + " - " + loginResult.getAccessToken().getToken());
-                handleFacebookAccessToken(loginResult.getAccessToken());
+                Log.i(TAG, "facebook:onSuccess:" + loginResult);
+                Log.i(TAG, "Access token details: " + loginResult.getAccessToken().toString());
+                Log.i(TAG,"Token: " + AccessToken.getCurrentAccessToken().getToken());
+                Log.i(TAG,"Acc ID: " + AccessToken.getCurrentAccessToken().getUserId());
+                Log.i(TAG,"App ID: " + AccessToken.getCurrentAccessToken().getApplicationId());
+                Log.i(TAG,"Expires: " + AccessToken.getCurrentAccessToken().getExpires());
+                Log.i(TAG,"Last Refresh: " + AccessToken.getCurrentAccessToken().getLastRefresh());
+                Log.i(TAG,"Permissions: " + AccessToken.getCurrentAccessToken().getPermissions());
+                AccessToken.setCurrentAccessToken(loginResult.getAccessToken());
+                handleFacebookAccessToken(AccessToken.getCurrentAccessToken());
             }
 
             @Override
@@ -88,7 +97,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             }
         };
         loginFacebookButton.registerCallback(callbackManager, facebookCallback);
-        LoginManager.getInstance().registerCallback(callbackManager, facebookCallback);
+//        LoginManager.getInstance().registerCallback(callbackManager, facebookCallback);
     }
 
     @Override
@@ -97,8 +106,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // Check if user is signed in (non-null) and update UI accordingly.
 
         AccessToken fbAccessToken = AccessToken.getCurrentAccessToken();
-        if (fbAccessToken != null && fbAccessToken.isExpired())
-            handleFacebookAccessToken(fbAccessToken);
+        if (fbAccessToken != null && fbAccessToken.isExpired()) {
+            Toast.makeText(LoginActivity.this, "fbAccessToken is expired.",
+                    Toast.LENGTH_SHORT).show();
+//            handleFacebookAccessToken(fbAccessToken);
+        }
         else {
             // TODO: Skip this login shit if you're good to go. Check if access token is expired, etc.
             // You're not concerned with changing the UI of the login page once you get this working.
@@ -200,7 +212,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void handleFacebookAccessToken(AccessToken token) {
-        Log.d(TAG, "handleFacebookAccessToken:" + token);
+        Log.d(TAG, "handleFacebookAccessToken:" + token.getToken());
 
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential)
@@ -211,6 +223,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(LoginActivity.this, task.getResult().toString(),
+                                    Toast.LENGTH_LONG).show();
                             updateUI(user);
                         } else {
                             // If sign in fails, display a message to the user.
