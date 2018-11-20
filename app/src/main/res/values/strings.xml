@@ -10,8 +10,11 @@
     <!--Login Activity-->
     <string name="login_activity_email_label">Email</string>
     <string name="login_activity_password_label">Password</string>
-    <string name="login_activity_sign_in">Sign In</string>
-    <string name="login_activity_sign_out">Sign Out</string>
+    <string name="login_activity_first_name_label">First</string>
+    <string name="login_activity_last_name_label">Last</string>
+    <string name="login_activity_register_label">Register</string>
+    <string name="login_activity_sign_in_label">Sign In</string>
+    <string name="login_activity_sign_out_label">Sign Out</string>
 
     <string name="login_activity_status_auth_failed">Authentication failed</string>
     <string name="login_activity_status_signed_in">Signed In</string>

@@ -13,40 +13,72 @@
         android:layout_height="wrap_content"
         android:text="@string/login_activity_email_label"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="50dp"
-        />
+        android:layout_marginTop="50dp" />
     <EditText
         android:id="@+id/edit_text_login_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textEmailAddress"
-        app:layout_constraintTop_toTopOf="@id/text_view_login_email_label"
-        />
+        app:layout_constraintTop_toBottomOf="@id/text_view_login_email_label" />
+
     <TextView
         android:id="@+id/text_view_login_password_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/edit_text_login_email"
-        android:text="@string/login_activity_password_label"
-        />
+        android:text="@string/login_activity_password_label" />
     <EditText
         android:id="@+id/edit_text_login_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textVisiblePassword"
-        app:layout_constraintTop_toBottomOf="@+id/text_view_login_password_label"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/text_view_login_password_label" />
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraint_layout_login_register_fields"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/edit_text_login_password"
+        android:visibility="gone">
+        <TextView
+            android:id="@+id/text_view_login_first_name_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/login_activity_first_name_label" />
+        <EditText
+            android:id="@+id/edit_text_login_first_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_percent="0.5"
+            app:layout_constraintTop_toBottomOf="@id/text_view_login_first_name_label"/>
+
+        <TextView
+            android:id="@+id/text_view_login_last_name_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/login_activity_last_name_label"
+            app:layout_constraintStart_toStartOf="@id/edit_text_login_last_name" />
+        <EditText
+            android:id="@+id/edit_text_login_last_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_percent="0.5"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_view_login_last_name_label"/>
+    </android.support.constraint.ConstraintLayout>
+
+
     <TextView
         android:id="@+id/text_view_login_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edit_text_login_password"/>
+        app:layout_constraintTop_toBottomOf="@id/constraint_layout_login_register_fields"/>
+
     <TextView
         android:id="@+id/text_view_login_details"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_view_login_status"/>
 
     <Button
@@ -56,10 +88,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_view_login_details" />
+
     <Button
         android:id="@+id/button_login_email_register"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:text="@string/login_activity_register_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/button_login_email" />
@@ -82,16 +117,8 @@
             android:id="@+id/buttonFacebookLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:layout_centerInParent="true" />
-
-        <Button
-            android:id="@+id/buttonFacebookSignout"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="@string/login_activity_sign_out"
-            android:visibility="gone"/>
 
     </RelativeLayout>
 
