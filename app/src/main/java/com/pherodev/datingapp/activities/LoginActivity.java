@@ -21,6 +21,7 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -28,7 +29,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.pherodev.datingapp.R;
+import com.pherodev.datingapp.models.Person;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -47,6 +51,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText loginLastNameEditText;
 
     private FirebaseAuth firebaseAuth;
+    private DatabaseReference firebaseDatabase;
     private CallbackManager callbackManager;
     private FacebookCallback<LoginResult> facebookCallback;
     private OnCompleteListener<AuthResult> completionListener;
@@ -58,6 +63,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         firebaseAuth = FirebaseAuth.getInstance();
+        firebaseDatabase = FirebaseDatabase.getInstance().getReference();
         callbackManager = CallbackManager.Factory.create();
 
         loginEmailEditText = (EditText) findViewById(R.id.edit_text_login_email);
@@ -111,6 +117,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     // Sign in success
                     Log.d(TAG, "signIn:success");
                     FirebaseUser user = firebaseAuth.getCurrentUser();
+                    if (task.getResult().getAdditionalUserInfo().isNewUser())
+                        writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail());
                     if (debugRemainInLogin)
                         updateUI(user);
                     else {
@@ -238,7 +246,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .addOnCompleteListener(this, completionListener);
     }
 
-    private void createAccount(String email, String password, String first, String last) {
+    private void createAccount(final String email, String password, final String first, final String last) {
         Log.d(TAG, "createAccount:" + email);
         if (!validateForm(email, password, first, last))
             return;
@@ -247,10 +255,27 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
             @Override
             public void onSuccess(AuthResult authResult) {
-                // TODO: Add registering with new parameters (add them) first and last name.
-                
+                Log.d(TAG, "createUser:success");
+                writeNewUser(authResult.getUser().getUid(), first + last, email);
             }
         });
+    }
+
+    private void writeNewUser(String userId, String name, String email) {
+        Person p = new Person(userId, name, email);
+        firebaseDatabase.child("users").child(userId).setValue(p)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "writeNewUser:success");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "writeNewUser:" + e.getMessage());
+                    }
+                });
     }
 
     private void handleFacebookAccessToken(AccessToken token) {

@@ -16,13 +16,24 @@ import java.util.ArrayList;
 
 public class Person {
 
+    public String userId;
     public String name;
+    public String email;
     public URL profilePictureURL;
     public ArrayList<Conversation> conversations;
     public Location location;
 
     public Person() {
-        conversations = new ArrayList<>();
+        this.conversations = new ArrayList<>();
     }
+
+    public Person(String userId, String name, String email)
+    {
+        this.userId = userId;
+        this.name = name;
+        this.email = email;
+        this.conversations = new ArrayList<>();
+    }
+
 
 }
