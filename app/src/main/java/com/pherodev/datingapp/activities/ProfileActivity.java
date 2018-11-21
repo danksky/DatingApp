@@ -68,5 +68,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         LoginManager.getInstance().logOut();
         Intent backToLoginIntent = new Intent(this, LoginActivity.class);
         startActivity(backToLoginIntent);
+        finish();
     }
 }
