@@ -50,7 +50,7 @@ public class SearchResultsAdapter extends BaseAdapter {
         return position;
     }
 
-    // TODO: Add an OnClickListener to this. 
+    // TODO: Add an OnClickListener to this.
     public View getView(final int position, View view, ViewGroup parent) {
         final ViewHolder holder;
         if (view == null) {
