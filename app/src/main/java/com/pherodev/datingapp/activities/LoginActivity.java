@@ -132,41 +132,47 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     // Sign in success
                     Log.d(TAG, "signIn:success");
                     final FirebaseUser user = firebaseAuth.getCurrentUser();
+                    // a new and unregistered user
                     if (task.getResult().getAdditionalUserInfo().isNewUser()) {
-                        final UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                .setDisplayName(loginFirstNameEditText.getText() +
-                                        " " + loginLastNameEditText.getText())
-                                .build();
-                        // Update the displayName, write to RTDB, and proceed to next activity
-                        user.updateProfile(profileUpdates)
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    // I know, it's an OnCompleteListener in an OnCompleteListener.
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            Log.d(TAG, "updateProfile:success (displayName='" +
-                                                    profileUpdates.getDisplayName() + "')");
-                                            if (user != firebaseAuth.getCurrentUser())
-                                                Log.e(TAG, "updateProfile:(error) WRONG PROFILE?");
-                                            else {
-                                                writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail());
-                                                // Next
-                                                if (debugRemainInLogin)
-                                                    updateUI(user);
+                        // Check that the displayName is empty
+                        if (TextUtils.isEmpty(task.getResult().getUser().getDisplayName())) {
+                            final UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                    .setDisplayName(loginFirstNameEditText.getText() +
+                                            " " + loginLastNameEditText.getText())
+                                    .build();
+                            // Update the displayName, write to RTDB, and proceed to next activity
+                            user.updateProfile(profileUpdates)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        // I know, it's an OnCompleteListener in an OnCompleteListener.
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                Log.d(TAG, "updateProfile:success (displayName='" +
+                                                        profileUpdates.getDisplayName() + "')");
+                                                if (user != firebaseAuth.getCurrentUser())
+                                                    Log.e(TAG, "updateProfile:(error) WRONG PROFILE?");
                                                 else {
-                                                    proceedToNextActivity();
+                                                    // Now it's safe to write using the display name.
+                                                    writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail());
+                                                    // Next
+                                                    if (debugRemainInLogin) updateUI(user);
+                                                    else proceedToNextActivity();
+
                                                 }
                                             }
                                         }
-                                    }
-                                });
+                                    });
+                        } else {
+                            writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail());
+                            // Next
+                            if (debugRemainInLogin) updateUI(user);
+                            else proceedToNextActivity();
+
+                        }
                     } else {
                         // Next
-                        if (debugRemainInLogin)
-                            updateUI(user);
-                        else {
-                            proceedToNextActivity();
-                        }
+                        if (debugRemainInLogin) updateUI(user);
+                        else proceedToNextActivity();
                     }
 
                 } else {
