@@ -63,7 +63,8 @@
                 <data android:scheme="fb705055173204260" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.ProfileActivity"></activity>
+        <activity android:name=".activities.ProfileActivity" />
+        <activity android:name=".activities.SearchActivity"></activity>
     </application>
 
 </manifest>

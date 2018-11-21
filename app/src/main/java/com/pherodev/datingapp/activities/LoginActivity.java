@@ -393,7 +393,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void proceedToNextActivity() {
         // TODO: Make this startConversationsActivity
         Intent startProfileActivityIntent = new Intent(this, ProfileActivity.class);
-        startActivity(startProfileActivityIntent);
+        Intent startSearchActivityIntent = new Intent(this, SearchActivity.class);
+        startActivity(startSearchActivityIntent);
         finish();
     }
 

@@ -1,6 +1,7 @@
 package com.pherodev.datingapp.activities;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -11,14 +12,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.pherodev.datingapp.R;
+import com.pherodev.datingapp.models.Person;
 
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private final String TAG = "Profile";
+    private final static String TAG = "Profile";
 
     private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore firebaseFirestore;
 
     private TextView profileNameTextView;
     private TextView profileStatTextView;
@@ -29,6 +37,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         firebaseAuth = FirebaseAuth.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
 
         profileNameTextView = (TextView) findViewById(R.id.text_view_profile_name);
         profileStatTextView = (TextView) findViewById(R.id.text_view_profile_stat);
@@ -51,6 +60,20 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 else profileNameTextView.setText(displayName);
                 profileStatTextView.setText(firebaseAuth.getCurrentUser().getEmail());
             }
+            firebaseFirestore.collection("users")
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Log.d(TAG, document.getId() + " => " + document.toObject(Person.class).name);
+                                }
+                            } else {
+                                Log.w(TAG, "Error getting documents.", task.getException());
+                            }
+                        }
+                    });
         }
     }
 
