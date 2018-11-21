@@ -26,9 +26,7 @@ public class Person {
 //    private ArrayList<Issue> issues;
 //    private ArrayList<Report> reports;
 
-    public Person() {
-        this.conversations = new ArrayList<>();
-    }
+    public Person() { }
 
     public Person(String userId, String name, String email)
     {
@@ -38,5 +36,52 @@ public class Person {
         this.conversations = new ArrayList<>();
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public URL getProfilePictureURL() {
+        return profilePictureURL;
+    }
+
+    public void setProfilePictureURL(URL profilePictureURL) {
+        this.profilePictureURL = profilePictureURL;
+    }
+
+    public ArrayList<Conversation> getConversations() {
+        return conversations;
+    }
+
+    public void setConversations(ArrayList<Conversation> conversations) {
+        this.conversations = conversations;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
 
 }

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -38,8 +37,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.pherodev.datingapp.R;
 import com.pherodev.datingapp.models.Person;
 
@@ -63,7 +61,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText loginLastNameEditText;
 
     private FirebaseAuth firebaseAuth;
-    private DatabaseReference firebaseDatabase;
+    private FirebaseFirestore firebaseFirestore;
     private CallbackManager callbackManager;
     private FacebookCallback<LoginResult> facebookCallback;
     private GoogleSignInClient googleSignInClient;
@@ -76,7 +74,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         firebaseAuth = FirebaseAuth.getInstance();
-        firebaseDatabase = FirebaseDatabase.getInstance().getReference();
+        firebaseFirestore = FirebaseFirestore.getInstance();
         callbackManager = CallbackManager.Factory.create();
 
         loginEmailEditText = (EditText) findViewById(R.id.edit_text_login_email);
@@ -322,7 +320,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void writeNewUser(String userId, String name, String email) {
         Person p = new Person(userId, name, email);
-        firebaseDatabase.child("users").child(userId).setValue(p)
+        firebaseFirestore.collection("users").document(userId).set(p)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
