@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -20,6 +21,12 @@ import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -29,6 +36,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.pherodev.datingapp.R;
@@ -37,6 +46,8 @@ import com.pherodev.datingapp.models.Person;
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "Login";
+    // RC = request or result code
+    private static final int RC_SIGN_IN = 9001;
 
     private EditText loginEmailEditText;
     private EditText loginPasswordEditText;
@@ -45,6 +56,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private Button loginSignInButton;
     private Button loginRegisterButton;
     private LoginButton loginFacebookButton;
+    private SignInButton loginGoogleButton;
     // Register UI
     private ConstraintLayout loginRegisterConstraintLayout;
     private EditText loginFirstNameEditText;
@@ -54,7 +66,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private DatabaseReference firebaseDatabase;
     private CallbackManager callbackManager;
     private FacebookCallback<LoginResult> facebookCallback;
-    private OnCompleteListener<AuthResult> completionListener;
+    private GoogleSignInClient googleSignInClient;
+    private OnCompleteListener<AuthResult> loginCompletionListener;
 
     private boolean debugRemainInLogin = false;
 
@@ -72,7 +85,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         loginDetailTextView = (TextView) findViewById(R.id.text_view_login_details);
         loginSignInButton = (Button) findViewById(R.id.button_login_email);
         loginRegisterButton = (Button) findViewById(R.id.button_login_email_register);
-        loginFacebookButton = (LoginButton) findViewById(R.id.buttonFacebookLogin);
+        loginFacebookButton = (LoginButton) findViewById(R.id.button_facebook_login);
+        loginGoogleButton = (SignInButton) findViewById(R.id.button_google_login);
         // Register UI
         loginRegisterConstraintLayout = (ConstraintLayout) findViewById(R.id.constraint_layout_login_register_fields);
         loginFirstNameEditText = (EditText) findViewById(R.id.edit_text_login_first_name);
@@ -80,6 +94,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         loginSignInButton.setOnClickListener(this);
         loginRegisterButton.setOnClickListener(this);
+        loginGoogleButton.setOnClickListener(this);
 
         loginFacebookButton.setReadPermissions("email", "public_profile");
         facebookCallback = new FacebookCallback<LoginResult>() {
@@ -110,20 +125,50 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 updateUI(null);
             }
         };
-        completionListener = new OnCompleteListener<AuthResult>() {
+        loginCompletionListener = new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     // Sign in success
                     Log.d(TAG, "signIn:success");
-                    FirebaseUser user = firebaseAuth.getCurrentUser();
-                    if (task.getResult().getAdditionalUserInfo().isNewUser())
-                        writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail());
-                    if (debugRemainInLogin)
-                        updateUI(user);
-                    else {
-                        proceedToNextActivity();
+                    final FirebaseUser user = firebaseAuth.getCurrentUser();
+                    if (task.getResult().getAdditionalUserInfo().isNewUser()) {
+                        final UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                .setDisplayName(loginFirstNameEditText.getText() +
+                                        " " + loginLastNameEditText.getText())
+                                .build();
+                        // Update the displayName, write to RTDB, and proceed to next activity
+                        user.updateProfile(profileUpdates)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    // I know, it's an OnCompleteListener in an OnCompleteListener.
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Log.d(TAG, "updateProfile:success (displayName='" +
+                                                    profileUpdates.getDisplayName() + "')");
+                                            if (user != firebaseAuth.getCurrentUser())
+                                                Log.e(TAG, "updateProfile:(error) WRONG PROFILE?");
+                                            else {
+                                                writeNewUser(user.getUid(), user.getDisplayName(), user.getEmail());
+                                                // Next
+                                                if (debugRemainInLogin)
+                                                    updateUI(user);
+                                                else {
+                                                    proceedToNextActivity();
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+                    } else {
+                        // Next
+                        if (debugRemainInLogin)
+                            updateUI(user);
+                        else {
+                            proceedToNextActivity();
+                        }
                     }
+
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signIn:failure", task.getException());
@@ -138,6 +183,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             }
         };
         loginFacebookButton.registerCallback(callbackManager, facebookCallback);
+
+        // Configure sign-in to request the user's ID, email address, and basic
+        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        GoogleSignInOptions gsio = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_google_oauth_web_client_id))
+                .requestEmail()
+                .build();
+        googleSignInClient = GoogleSignIn.getClient(this, gsio);
+
     }
 
     @Override
@@ -174,12 +228,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     loginRegisterConstraintLayout.setVisibility(View.VISIBLE);
                 } else {
                     // Attempt to submit all the registration fields.
-                    createAccount(loginEmailEditText.getText().toString(),
+                    createAccountManually(loginEmailEditText.getText().toString(),
                             loginPasswordEditText.getText().toString(),
                             loginFirstNameEditText.getText().toString(),
                             loginLastNameEditText.getText().toString());
                 }
                 break;
+            case R.id.button_google_login:
+                Intent signInIntent = googleSignInClient.getSignInIntent();
+                startActivityForResult(signInIntent, RC_SIGN_IN);
+                break;
+
         }
     }
 
@@ -204,7 +263,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         return valid;
     }
-
     private boolean validateForm(String email, String password, String first, String last) {
         boolean valid = true;
         if (TextUtils.isEmpty(email)) {
@@ -242,23 +300,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         Log.d(TAG, "signIn:" + email);
         if (!validateForm())
             return;
+
         firebaseAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, completionListener);
+                .addOnCompleteListener(this, loginCompletionListener);
     }
 
-    private void createAccount(final String email, String password, final String first, final String last) {
-        Log.d(TAG, "createAccount:" + email);
+    private void createAccountManually(final String email, String password, final String first, final String last) {
+        // Authenticate a new user and add basic information to real time database
+        Log.d(TAG, "createAccountManually: (" + email + ")");
         if (!validateForm(email, password, first, last))
             return;
         firebaseAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, completionListener)
-                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-            @Override
-            public void onSuccess(AuthResult authResult) {
-                Log.d(TAG, "createUser:success");
-                writeNewUser(authResult.getUser().getUid(), first + last, email);
-            }
-        });
+                .addOnCompleteListener(this, loginCompletionListener);
     }
 
     private void writeNewUser(String userId, String name, String email) {
@@ -282,12 +335,33 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         Log.d(TAG, "handleFacebookAccessToken:" + token.getToken());
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         firebaseAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, completionListener);
+                .addOnCompleteListener(this, loginCompletionListener);
+    }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+        firebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this,loginCompletionListener);
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                firebaseAuthWithGoogle(account);
+            } catch (ApiException e) {
+                // Google Sign In failed, update UI appropriately
+                Log.w(TAG, "Google sign in failed", e);
+                updateUI(null);
+            }
+        }
     }
 
     public void signOut() {

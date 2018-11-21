@@ -3,6 +3,8 @@
     <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
     <string name="facebook_application_id" translatable="false">705055173204260</string>
     <string name="facebook_login_protocol_scheme" translatable="false">fb705055173204260</string>
+    <!-- Google Sign-In -->
+    <string name="default_google_oauth_web_client_id">271847460761-uf0e49frb5vqarpbvpiu1njccruprn1e.apps.googleusercontent.com</string>
 
     <!--Status-->
     <string name="loading">Loading…</string>

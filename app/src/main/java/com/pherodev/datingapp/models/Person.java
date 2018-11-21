@@ -23,6 +23,9 @@ public class Person {
     public ArrayList<Conversation> conversations;
     public Location location;
 
+//    private ArrayList<Issue> issues;
+//    private ArrayList<Report> reports;
+
     public Person() {
         this.conversations = new ArrayList<>();
     }
