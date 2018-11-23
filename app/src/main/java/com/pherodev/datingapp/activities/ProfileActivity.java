@@ -19,11 +19,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.pherodev.datingapp.R;
+import com.pherodev.datingapp.adapters.SearchResultsAdapter;
 import com.pherodev.datingapp.models.Person;
 
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
     private final static String TAG = "Profile";
+
+    public final static String PERSON_KEY = "person";
 
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
@@ -31,7 +34,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private TextView profileNameTextView;
     private TextView profileStatTextView;
     private Button signOutButton;
-
 
     // TODO: NEXT! Seed the database programmatically.
 
@@ -63,26 +65,24 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             // TODO: Make custom UI edit fields for when you're viewing your own profile.
             // TODO: Create the ability to edit the profile
 
-            if (firebaseAuth.getCurrentUser() != null) {
-                String displayName = firebaseAuth.getCurrentUser().getDisplayName();
-                if (TextUtils.isEmpty(displayName)) Log.e(TAG, "populate:failure");
-                else profileNameTextView.setText(displayName);
-                profileStatTextView.setText(firebaseAuth.getCurrentUser().getEmail());
-            }
-            firebaseFirestore.collection("users")
-                    .get()
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                    Log.d(TAG, document.getId() + " => " + document.toObject(Person.class).name);
-                                }
-                            } else {
-                                Log.w(TAG, "Error getting documents.", task.getException());
-                            }
-                        }
-                    });
+            populateUI();
+        }
+    }
+
+    private void populateUI() {
+        if (getIntent() != null || getIntent().getExtras() != null) {
+            Bundle personBundle = getIntent().getBundleExtra(PERSON_KEY);
+            Person person = personBundle.getParcelable(PERSON_KEY);
+            profileNameTextView.setText(person.getName());
+            profileStatTextView.setText(person.getEmail());
+        } else {
+            // TODO: Figure out error report submission.
+            String error = "Intent (" + (getIntent() == null ? "null" : "non-null") + ")" +
+                    "\t" +
+                    "Extras (" + (getIntent() == null || getIntent().getExtras() == null ? "null" : "non-null") + ")";
+            // TODO: Extend Exception for this?
+            Log.e(TAG, error);
+            Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
         }
     }
 

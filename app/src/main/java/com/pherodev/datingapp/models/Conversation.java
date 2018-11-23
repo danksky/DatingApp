@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 public class Conversation implements Parcelable {
 
+    public String conversationId;
+
     public ArrayList<String> conversers;
     public ArrayList<DateMessage> messages;
 
@@ -47,6 +49,14 @@ public class Conversation implements Parcelable {
         conversationBundle.putStringArrayList(CONVERSERS_KEY, conversers);
         conversationBundle.putParcelableArrayList(MESSAGES_KEY, messages);
         dest.writeBundle(conversationBundle);
+    }
+
+    public String getConversationId() {
+        return conversationId;
+    }
+
+    public void setConversationId(String conversationId) {
+        this.conversationId = conversationId;
     }
 
     public ArrayList<String> getConversers() {

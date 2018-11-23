@@ -1,8 +1,10 @@
 package com.pherodev.datingapp.adapters;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,24 +12,31 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.pherodev.datingapp.R;
+import com.pherodev.datingapp.activities.ProfileActivity;
 import com.pherodev.datingapp.models.Person;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
+import static com.pherodev.datingapp.activities.ProfileActivity.PERSON_KEY;
+
 public class SearchResultsAdapter extends BaseAdapter {
 
     private final static String TAG = "Search";
 
-    private Context mContext;
+    private Context context;
     private LayoutInflater inflater;
     private ArrayList<Person> masterSearchResults;
     private ArrayList<Person> filtered;
 
     public SearchResultsAdapter(Context context, ArrayList<Person> searchResults) {
-        this.mContext = context;
-        this.inflater = LayoutInflater.from(mContext);
+        this.context = context;
+        this.inflater = LayoutInflater.from(this.context);
         this.masterSearchResults = searchResults;
         this.filtered = new ArrayList<>();
         this.filtered.addAll(masterSearchResults);
@@ -77,8 +86,25 @@ public class SearchResultsAdapter extends BaseAdapter {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle personBundle = new Bundle();
-
+                FirebaseFirestore.getInstance().collection("users").document(filtered.get(position).userId)
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    Bundle personBundle = new Bundle();
+                                    Person p = task.getResult().toObject(Person.class);
+                                    Log.d(TAG, "getUserById:" + p.name);
+                                    personBundle.putParcelable(PERSON_KEY, p);
+                                    Intent startProfileActivity = new Intent(context, ProfileActivity.class);
+                                    startProfileActivity.putExtra(PERSON_KEY, personBundle);
+                                    context.startActivity(startProfileActivity);
+                                    // TODO: Figure out finishing an activity from adapter
+                                } else {
+                                    Log.e(TAG, "getUserById:failure");
+                                }
+                            }
+                        });
             }
         });
         return view;

@@ -33,9 +33,10 @@ public class ConversationsAdapter extends RecyclerView.Adapter<ConversationsAdap
 
     @Override
     public void onBindViewHolder(ConversationViewHolder holder, int position) {
-        holder.correspondentTextView.setText(conversations.get(position).conversers.get(0));
+        holder.correspondentTextView.setText(conversations.get(position).conversers.get(1));
         ArrayList<DateMessage> messages = conversations.get(position).messages;
-        holder.previewTextView.setText(((TextMessage) messages.get(messages.size()-1)).text);
+        holder.previewTextView.setText(messages.get(messages.size()-1).sent.toString());
+        // TODO: Implement profile icons
 //        Picasso.get().load(conversations.get(position).conversers.get(0).profilePictureURL.toString())
 //                .error(R.drawable.ic_launcher_background)
 //                .resize(45, 45)

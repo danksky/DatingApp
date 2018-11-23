@@ -38,6 +38,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.pherodev.datingapp.R;
 import com.pherodev.datingapp.models.Conversation;
@@ -47,6 +48,8 @@ import com.pherodev.datingapp.models.TextMessage;
 
 import java.util.Date;
 import java.util.UUID;
+
+import static com.pherodev.datingapp.activities.ProfileActivity.PERSON_KEY;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -399,10 +402,31 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void proceedToNextActivity() {
         // TODO: Make this startConversationsActivity
-        Intent startProfileActivityIntent = new Intent(this, ProfileActivity.class);
-        Intent startSearchActivityIntent = new Intent(this, SearchActivity.class);
-        startActivity(startProfileActivityIntent);
-        finish();
+
+        OnCompleteListener<DocumentSnapshot> fetchUserAndProceed = new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "fetchUser:success");
+                    Bundle personBundle = new Bundle();
+                    Person p = task.getResult().toObject(Person.class);
+                    personBundle.putParcelable(PERSON_KEY, p);
+                    Intent startConversationsActivityIntent = new Intent(getApplicationContext(), ConversationsActivity.class);
+                    Intent startProfileActivityIntent = new Intent(getApplicationContext(), ProfileActivity.class);
+                    Intent startSearchActivityIntent = new Intent(getApplicationContext(), SearchActivity.class);
+                    startProfileActivityIntent.putExtra(PERSON_KEY, personBundle);
+                    startActivity(startConversationsActivityIntent);
+                    finish();
+                } else {
+                    Log.e(TAG, "fetchUser:" + task.getException().getMessage());
+                }
+            }
+        };
+
+        String currentUserId = firebaseAuth.getCurrentUser().getUid();
+        firebaseFirestore.collection("users").document(currentUserId).get()
+                .addOnCompleteListener(fetchUserAndProceed);
+
     }
 
     private void seedDatabase()

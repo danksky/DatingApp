@@ -1,10 +1,18 @@
 package com.pherodev.datingapp.activities;
 
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.pherodev.datingapp.R;
 import com.pherodev.datingapp.adapters.ConversationsAdapter;
 import com.pherodev.datingapp.models.Conversation;
@@ -14,82 +22,62 @@ import com.pherodev.datingapp.models.TextMessage;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class ConversationsActivity extends AppCompatActivity {
 
+    private final static String TAG = "Conversations";
+
+    private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore firebaseFirestore;
+
     private RecyclerView conversationsRecyclerView;
-    private RecyclerView.LayoutManager layoutManager;
+    private RecyclerView.LayoutManager conversationsLayoutManager;
     private ConversationsAdapter conversationsAdapter;
 
-    private Person p;
+    private ArrayList<Conversation> conversations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversations);
-        try {
-            p = fakeInit();
-            conversationsRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_conversations);
-            conversationsRecyclerView.setHasFixedSize(true);
-            layoutManager = new LinearLayoutManager(this);
-            conversationsRecyclerView.setLayoutManager(layoutManager);
-            conversationsAdapter = new ConversationsAdapter(p.conversations);
-            conversationsRecyclerView.setAdapter(conversationsAdapter);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+
+        conversations = new ArrayList<>();
+        populateConversations();
+
+        conversationsRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_conversations);
+        conversationsRecyclerView.setHasFixedSize(true);
+        conversationsLayoutManager = new LinearLayoutManager(this);
+        conversationsAdapter = new ConversationsAdapter(conversations);
+        conversationsRecyclerView.setLayoutManager(conversationsLayoutManager);
+        conversationsRecyclerView.setAdapter(conversationsAdapter);
     }
 
-    public Person fakeInit() throws MalformedURLException {
-        Person p1 = new Person();
-        p1.name = "Daniel";
-        p1.profilePictureURL = new URL("https://via.placeholder.com/50");
+    private void populateConversations() {
+        // TODO: Replace aaronId with firebaseAuth.getCurrentUser.getUid()
+        String aaronId = "fc85b6d3-5b55-46d2-8578-31f2bdba29f0";
+        // TODO: Implement conversations collection, turning Person's conversations into an array of String conversationIds
+        firebaseFirestore.collection("users").document(aaronId).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "fetchConversations:success");
+                            ArrayList<Conversation> convoList = task.getResult().toObject(Person.class).conversations;
+                            conversations.clear();
+                            conversations.addAll(convoList);
+                            conversationsAdapter.notifyDataSetChanged();
+                        } else {
+                            Log.e(TAG, "fetchConversations:"+task.getException().getMessage());
+                        }
+                    }
+                });
 
-        Person p2 = new Person();
-        p2.name = "Adam";
-        p2.profilePictureURL = new URL("https://via.placeholder.com/50");
-
-        Conversation c1 = new Conversation();
-        c1.conversers.add(p1.name);
-        c1.conversers.add(p2.name);
-
-        TextMessage t1 = new TextMessage();
-        t1.author = p1.name;
-        t1.sent = new Date();
-        t1.text = "Hello";
-
-        TextMessage t2 = new TextMessage();
-        t2.author = p2.name;
-        t2.sent = new Date();
-        t2.text = "What's up?";
-
-        c1.messages.add(t1);
-        c1.messages.add(t2);
-
-        Conversation c2 = new Conversation();
-        c2.conversers.add(p1.name);
-        c2.conversers.add(p2.name);
-
-        TextMessage t3 = new TextMessage();
-        t3.author = p1.name;
-        t3.sent = new Date();
-        t3.text = "Hello2";
-
-        TextMessage t4 = new TextMessage();
-        t4.author = p2.name;
-        t4.sent = new Date();
-        t4.text = "What's up?2";
-
-        c2.messages.add(t1);
-        c2.messages.add(t2);
-
-        p1.conversations.add(c1);
-        p1.conversations.add(c2);
-
-        p2.conversations.add(c1);
-        p2.conversations.add(c2);
-
-        return p1;
+        // TODO: Implement local cache of messages
     }
+
 }
