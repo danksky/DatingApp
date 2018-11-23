@@ -1,10 +1,8 @@
 package com.pherodev.datingapp.activities;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -12,32 +10,28 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.pherodev.datingapp.R;
-import com.pherodev.datingapp.adapters.SearchResultsAdapter;
 import com.pherodev.datingapp.models.Person;
 
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
     private final static String TAG = "Profile";
 
-    public final static String PERSON_KEY = "person";
+    public final static String PERSON_USER_KEY = "userPerson";
+    public final static String PERSON_SELECTED_KEY = "selectedPerson";
 
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
 
+    private Person profilePerson;
+
     private TextView profileNameTextView;
     private TextView profileStatTextView;
+    private Button profileChatButton;
     private Button signOutButton;
 
-    // TODO: NEXT! Seed the database programmatically.
-
-    // TODO: Update this to bring in Bundle information, not FirebaseUser information
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,8 +41,10 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         profileNameTextView = (TextView) findViewById(R.id.text_view_profile_name);
         profileStatTextView = (TextView) findViewById(R.id.text_view_profile_stat);
+        profileChatButton = (Button) findViewById(R.id.button_profile_chat);
         signOutButton = (Button) findViewById(R.id.button_profile_logout);
 
+        profileChatButton.setOnClickListener(this);
         signOutButton.setOnClickListener(this);
     }
 
@@ -61,7 +57,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             Log.e(TAG, err);
             Toast.makeText(this, err, Toast.LENGTH_SHORT).show();
         } else {
-            // TODO: Populate the UI with Bundle fields rather than Firebase user fields.
             // TODO: Make custom UI edit fields for when you're viewing your own profile.
             // TODO: Create the ability to edit the profile
 
@@ -71,10 +66,10 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     private void populateUI() {
         if (getIntent() != null || getIntent().getExtras() != null) {
-            Bundle personBundle = getIntent().getBundleExtra(PERSON_KEY);
-            Person person = personBundle.getParcelable(PERSON_KEY);
-            profileNameTextView.setText(person.getName());
-            profileStatTextView.setText(person.getEmail());
+            Bundle personBundle = getIntent().getBundleExtra(PERSON_SELECTED_KEY);
+            profilePerson = personBundle.getParcelable(PERSON_SELECTED_KEY);
+            profileNameTextView.setText(profilePerson.getName());
+            profileStatTextView.setText(profilePerson.getEmail());
         } else {
             // TODO: Figure out error report submission.
             String error = "Intent (" + (getIntent() == null ? "null" : "non-null") + ")" +
@@ -91,6 +86,11 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         switch (v.getId()) {
             case R.id.button_profile_logout:
                 signOut();
+                break;
+            case R.id.button_profile_chat:
+                // TODO: (Create a new chat, then) launch the chat.
+                // TODO: (It. 3) You choose from a list of threads that you're both in.
+
                 break;
         }
     }

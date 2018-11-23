@@ -47,7 +47,7 @@ import com.pherodev.datingapp.models.Person;
 import java.util.Date;
 import java.util.UUID;
 
-import static com.pherodev.datingapp.activities.ProfileActivity.PERSON_KEY;
+import static com.pherodev.datingapp.activities.ProfileActivity.PERSON_USER_KEY;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -408,11 +408,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     Log.d(TAG, "fetchUser:success");
                     Bundle personBundle = new Bundle();
                     Person p = task.getResult().toObject(Person.class);
-                    personBundle.putParcelable(PERSON_KEY, p);
+                    personBundle.putParcelable(PERSON_USER_KEY, p);
                     Intent startConversationsActivityIntent = new Intent(getApplicationContext(), ConversationsActivity.class);
                     Intent startProfileActivityIntent = new Intent(getApplicationContext(), ProfileActivity.class);
+                    startProfileActivityIntent.putExtra(PERSON_USER_KEY, personBundle);
                     Intent startSearchActivityIntent = new Intent(getApplicationContext(), SearchActivity.class);
-                    startProfileActivityIntent.putExtra(PERSON_KEY, personBundle);
                     startActivity(startConversationsActivityIntent);
                     finish();
                 } else {

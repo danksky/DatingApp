@@ -69,21 +69,6 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
-    // TODO: Replace this with a Firestore seeder
-    private ArrayList<Person> getFakeList() {
-        ArrayList<Person> fakeList = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            StringBuilder randomName = new StringBuilder();
-            for (int j = 0; j < 10; j++)
-                randomName.append((char) ('a' + Math.random() * 26));
-            randomName.insert(0, ' ');
-            String name = i + randomName.toString();
-            String email = i + "@gmail.com";
-            fakeList.add(new Person(UUID.randomUUID().toString(), name, email));
-        }
-        return fakeList;
-    }
-
     private void getPersonList() {
         personList.clear();
         firebaseFirestore.collection("users").get()

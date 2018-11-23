@@ -28,4 +28,7 @@
     <!--Search Activity-->
     <string name="search_activities_search_hint">Search users...</string>
 
+    <!--Profile Activity-->
+    <string name="profile_chat_label">Chat</string>
+
 </resources>

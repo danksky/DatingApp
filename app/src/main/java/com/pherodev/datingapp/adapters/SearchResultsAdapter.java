@@ -1,6 +1,5 @@
 package com.pherodev.datingapp.adapters;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,7 +22,7 @@ import com.pherodev.datingapp.models.Person;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import static com.pherodev.datingapp.activities.ProfileActivity.PERSON_KEY;
+import static com.pherodev.datingapp.activities.ProfileActivity.PERSON_SELECTED_KEY;
 
 public class SearchResultsAdapter extends BaseAdapter {
 
@@ -95,9 +94,9 @@ public class SearchResultsAdapter extends BaseAdapter {
                                     Bundle personBundle = new Bundle();
                                     Person p = task.getResult().toObject(Person.class);
                                     Log.d(TAG, "getUserById:" + p.name);
-                                    personBundle.putParcelable(PERSON_KEY, p);
+                                    personBundle.putParcelable(PERSON_SELECTED_KEY, p);
                                     Intent startProfileActivity = new Intent(context, ProfileActivity.class);
-                                    startProfileActivity.putExtra(PERSON_KEY, personBundle);
+                                    startProfileActivity.putExtra(PERSON_SELECTED_KEY, personBundle);
                                     context.startActivity(startProfileActivity);
                                     // TODO: Figure out finishing an activity from adapter
                                 } else {

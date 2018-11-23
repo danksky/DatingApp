@@ -56,14 +56,12 @@ public class ConversationsActivity extends AppCompatActivity {
     /**
     private void populateConversationIds() {
         if (getIntent() != null || getIntent().getExtras() != null) {
-            Bundle personBundle = getIntent().getBundleExtra(PERSON_KEY);
-            conversationsIds = ((Person) personBundle.getParcelable(PERSON_KEY)).conversationIds;
+            Bundle personBundle = getIntent().getBundleExtra(USER_PERSON_KEY);
+            conversationsIds = ((Person) personBundle.getParcelable(USER_PERSON_KEY)).conversationIds;
         } else {
-            // TODO: Figure out error report submission.
             String error = "Intent (" + (getIntent() == null ? "null" : "non-null") + ")" +
                     "\t" +
                     "Extras (" + (getIntent() == null || getIntent().getExtras() == null ? "null" : "non-null") + ")";
-            // TODO: Extend Exception for this?
             Log.e(TAG, error);
             Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
         }
@@ -71,9 +69,8 @@ public class ConversationsActivity extends AppCompatActivity {
     */
 
     private void populateConversations() {
-        // TODO: Replace aaronId with firebaseAuth.getCurrentUser.getUid()
+        // TODO: Replace aaronId with firebaseAuth.getCurrentUser.getUid() or userPersonBundle's id (see comment above)
         String aaronId = "31be09d3-5bed-488d-9004-99925f4f1776";
-        // TODO: Implement conversations collection, turning Person's conversations into an array of String conversationIds
         firebaseFirestore.collection("users").document(aaronId).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
