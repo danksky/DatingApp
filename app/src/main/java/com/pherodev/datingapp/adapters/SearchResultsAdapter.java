@@ -1,6 +1,8 @@
 package com.pherodev.datingapp.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +33,13 @@ public class SearchResultsAdapter extends BaseAdapter {
         this.filtered.addAll(masterSearchResults);
     }
 
+    public void resetSearchResults(ArrayList<Person> searchResults) {
+        masterSearchResults = searchResults;
+        filtered.clear();
+        filtered.addAll(masterSearchResults);
+        notifyDataSetChanged();
+    }
+
     public class ViewHolder {
         TextView nameTextView;
     }
@@ -50,7 +59,8 @@ public class SearchResultsAdapter extends BaseAdapter {
         return position;
     }
 
-    // TODO: Add an OnClickListener to this.
+    // TODO: Add an OnClickListener to this that launches profile activity with the provided information.
+    // TODO: Pass a Bundle to the ProfileActivity for query.
     public View getView(final int position, View view, ViewGroup parent) {
         final ViewHolder holder;
         if (view == null) {
@@ -64,6 +74,13 @@ public class SearchResultsAdapter extends BaseAdapter {
         }
         // Set the results into TextViews
         holder.nameTextView.setText(filtered.get(position).getName());
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bundle personBundle = new Bundle();
+
+            }
+        });
         return view;
     }
 

@@ -51,16 +51,16 @@ public class ConversationsActivity extends AppCompatActivity {
         p2.profilePictureURL = new URL("https://via.placeholder.com/50");
 
         Conversation c1 = new Conversation();
-        c1.conversers.add(p1);
-        c1.conversers.add(p2);
+        c1.conversers.add(p1.name);
+        c1.conversers.add(p2.name);
 
         TextMessage t1 = new TextMessage();
-        t1.author = p1;
+        t1.author = p1.name;
         t1.sent = new Date();
         t1.text = "Hello";
 
         TextMessage t2 = new TextMessage();
-        t2.author = p2;
+        t2.author = p2.name;
         t2.sent = new Date();
         t2.text = "What's up?";
 
@@ -68,16 +68,16 @@ public class ConversationsActivity extends AppCompatActivity {
         c1.messages.add(t2);
 
         Conversation c2 = new Conversation();
-        c2.conversers.add(p1);
-        c2.conversers.add(p2);
+        c2.conversers.add(p1.name);
+        c2.conversers.add(p2.name);
 
         TextMessage t3 = new TextMessage();
-        t3.author = p1;
+        t3.author = p1.name;
         t3.sent = new Date();
         t3.text = "Hello2";
 
         TextMessage t4 = new TextMessage();
-        t4.author = p2;
+        t4.author = p2.name;
         t4.sent = new Date();
         t4.text = "What's up?2";
 

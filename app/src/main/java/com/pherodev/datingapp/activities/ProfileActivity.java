@@ -32,6 +32,10 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     private TextView profileStatTextView;
     private Button signOutButton;
 
+
+    // TODO: NEXT! Seed the database programmatically.
+
+    // TODO: Update this to bring in Bundle information, not FirebaseUser information
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,11 +53,16 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onStart() {
         super.onStart();
+        // TODO: Make the app launch to the conversations screen and redirect if no token.
         if (firebaseAuth == null) {
             String err = "Not logged in because Firebase is null";
             Log.e(TAG, err);
             Toast.makeText(this, err, Toast.LENGTH_SHORT).show();
         } else {
+            // TODO: Populate the UI with Bundle fields rather than Firebase user fields.
+            // TODO: Make custom UI edit fields for when you're viewing your own profile.
+            // TODO: Create the ability to edit the profile
+
             if (firebaseAuth.getCurrentUser() != null) {
                 String displayName = firebaseAuth.getCurrentUser().getDisplayName();
                 if (TextUtils.isEmpty(displayName)) Log.e(TAG, "populate:failure");

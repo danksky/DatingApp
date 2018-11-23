@@ -26,6 +26,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -39,7 +40,13 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.pherodev.datingapp.R;
+import com.pherodev.datingapp.models.Conversation;
+import com.pherodev.datingapp.models.DateMessage;
 import com.pherodev.datingapp.models.Person;
+import com.pherodev.datingapp.models.TextMessage;
+
+import java.util.Date;
+import java.util.UUID;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -195,7 +202,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .requestEmail()
                 .build();
         googleSignInClient = GoogleSignIn.getClient(this, gsio);
-
+//        seedDatabase();
     }
 
     @Override
@@ -394,8 +401,79 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // TODO: Make this startConversationsActivity
         Intent startProfileActivityIntent = new Intent(this, ProfileActivity.class);
         Intent startSearchActivityIntent = new Intent(this, SearchActivity.class);
-        startActivity(startSearchActivityIntent);
+        startActivity(startProfileActivityIntent);
         finish();
     }
 
+    private void seedDatabase()
+    {
+        Log.d(TAG, "seedDatabase");
+        Person aaron = new Person(UUID.randomUUID().toString(), "Aaron Kawalsky", "kawalsky.aaron@gmail.com");
+        Person eric = new Person(UUID.randomUUID().toString(), "Eric Kawalsky", "eric.kawalsky@gmail.com");
+        Person colin = new Person(UUID.randomUUID().toString(), "Colin Kawalsky", "colin.kawalsky@gmail.com");
+        Person barbara = new Person(UUID.randomUUID().toString(), "Barbara Kawalsky", "barbara.kawalsky@gmail.com");
+
+        Conversation convoAaronEric = new Conversation();
+        convoAaronEric.conversers.add(aaron.name);
+        convoAaronEric.conversers.add(eric.name);
+        for (int i = 0; i < 10; i++)
+        {
+            TextMessage tm = new TextMessage();
+            if (i%2==0) tm.author = aaron.name;
+            else tm.author = eric.name;
+            tm.text = "I am message " + i + ".";
+            tm.sent = new Date(new Date().getTime() + 1000 * i);
+            convoAaronEric.messages.add(tm);
+        }
+        aaron.conversations.add(convoAaronEric); eric.conversations.add(convoAaronEric);
+
+        Conversation convoAaronBarbara = new Conversation();
+        convoAaronBarbara.conversers.add(aaron.name);
+        convoAaronBarbara.conversers.add(barbara.name);
+        for (int i = 0; i < 10; i++)
+        {
+            TextMessage tm = new TextMessage();
+            if (i%2==0) tm.author = aaron.name;
+            else tm.author = barbara.name;
+            tm.text = "I am message " + i + ".";
+            tm.sent = new Date(new Date().getTime() + 1000 * i);
+            convoAaronBarbara.messages.add(tm);
+        }
+        aaron.conversations.add(convoAaronBarbara); barbara.conversations.add(convoAaronBarbara);
+
+        Conversation convoAaronColin = new Conversation();
+        convoAaronColin.conversers.add(aaron.name);
+        convoAaronColin.conversers.add(colin.name);
+        for (int i = 0; i < 10; i++)
+        {
+            TextMessage tm = new TextMessage();
+            if (i%2==0) tm.author = aaron.name;
+            else tm.author = colin.name;
+            tm.text = "I am message " + i + ".";
+            tm.sent = new Date(new Date().getTime() + 1000 * i);
+            convoAaronColin.messages.add(tm);
+        }
+        aaron.conversations.add(convoAaronColin); colin.conversations.add(convoAaronColin);
+        OnCompleteListener seedCompleteListener = new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "seed:success");
+                } else {
+                    Log.e(TAG, "seed:" + task.getException());
+                }
+            }
+        };
+        OnCanceledListener seedCancelListener = new OnCanceledListener() {
+            @Override
+            public void onCanceled() {
+                Log.d(TAG, "seed:cancel");
+            }
+        };
+
+        firebaseFirestore.collection("users").document(aaron.userId).set(aaron).addOnCompleteListener(seedCompleteListener).addOnCanceledListener(seedCancelListener);
+        firebaseFirestore.collection("users").document(eric.userId).set(eric).addOnCompleteListener(seedCompleteListener).addOnCanceledListener(seedCancelListener);
+        firebaseFirestore.collection("users").document(barbara.userId).set(barbara).addOnCompleteListener(seedCompleteListener).addOnCanceledListener(seedCancelListener);
+        firebaseFirestore.collection("users").document(colin.userId).set(colin).addOnCompleteListener(seedCompleteListener).addOnCanceledListener(seedCancelListener);
+    }
 }

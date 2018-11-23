@@ -33,13 +33,13 @@ public class ConversationsAdapter extends RecyclerView.Adapter<ConversationsAdap
 
     @Override
     public void onBindViewHolder(ConversationViewHolder holder, int position) {
-        holder.correspondentTextView.setText(conversations.get(position).conversers.get(0).name);
+        holder.correspondentTextView.setText(conversations.get(position).conversers.get(0));
         ArrayList<DateMessage> messages = conversations.get(position).messages;
         holder.previewTextView.setText(((TextMessage) messages.get(messages.size()-1)).text);
-        Picasso.get().load(conversations.get(position).conversers.get(0).profilePictureURL.toString())
-                .error(R.drawable.ic_launcher_background)
-                .resize(45, 45)
-                .into(holder.correspondentImageView);
+//        Picasso.get().load(conversations.get(position).conversers.get(0).profilePictureURL.toString())
+//                .error(R.drawable.ic_launcher_background)
+//                .resize(45, 45)
+//                .into(holder.correspondentImageView);
     }
 
     @Override
