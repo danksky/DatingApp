@@ -21,7 +21,7 @@ public class ConversationsAdapter extends RecyclerView.Adapter<ConversationsAdap
     }
 
     @Override
-    public ConversationsAdapter.ConversationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ConversationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.conversation_item, parent, false);
         ConversationViewHolder cvh = new ConversationViewHolder(v);
@@ -30,9 +30,11 @@ public class ConversationsAdapter extends RecyclerView.Adapter<ConversationsAdap
 
     @Override
     public void onBindViewHolder(ConversationViewHolder holder, int position) {
+        // TODO: Implement date last message sent
         holder.correspondentTextView.setText(conversations.get(position).converserNames.get(1));
         ArrayList<DateMessage> messages = conversations.get(position).messages;
-        holder.previewTextView.setText(messages.get(messages.size()-1).sent.toString());
+        holder.dateTextView.setText(messages.get(messages.size()-1).sent.toString());
+        holder.previewTextView.setText(messages.get(messages.size()-1).text);
         // TODO: Implement profile icons
 //        Picasso.get().load(conversations.get(position).converserIds.get(0).profilePictureURL.toString())
 //                .error(R.drawable.ic_launcher_background)
@@ -48,12 +50,14 @@ public class ConversationsAdapter extends RecyclerView.Adapter<ConversationsAdap
     public static class ConversationViewHolder extends RecyclerView.ViewHolder {
         public ImageView correspondentImageView;
         public TextView correspondentTextView;
+        public TextView dateTextView;
         public TextView previewTextView;
 
         public ConversationViewHolder(final View itemView) {
             super(itemView);
             correspondentTextView = (TextView) itemView.findViewById(R.id.text_view_conversation_item_correspondent);
             previewTextView       = (TextView) itemView.findViewById(R.id.text_view_conversation_item_preview);
+            dateTextView          = (TextView) itemView.findViewById(R.id.text_view_conversation_item_date);
             correspondentImageView = (ImageView) itemView.findViewById(R.id.image_view_conversation_item_correspondent);
         }
     }

@@ -443,8 +443,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         for (int i = 0; i < 10; i++)
         {
             DateMessage tm = new DateMessage();
-            if (i%2==0) tm.authorName = aaron.name;
-            else tm.authorName = eric.name;
+            if (i%2==0) { tm.authorName = aaron.name; tm.authorId = aaron.userId; }
+            else { tm.authorName = eric.name; tm.authorId = eric.userId; }
             tm.text = "I am message " + i + ".";
             tm.sent = new Date(new Date().getTime() + 1000 * i);
             convoAaronEric.messages.add(tm);
@@ -460,8 +460,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         for (int i = 0; i < 10; i++)
         {
             DateMessage tm = new DateMessage();
-            if (i%2==0) tm.authorName = aaron.name;
-            else tm.authorName = barbara.name;
+            if (i%2==0) { tm.authorName = aaron.name; tm.authorId = aaron.userId; }
+            else { tm.authorName = barbara.name; tm.authorId = barbara.userId; }
             tm.text = "I am message " + i + ".";
             tm.sent = new Date(new Date().getTime() + 1000 * i);
             convoAaronBarbara.messages.add(tm);
@@ -477,8 +477,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         for (int i = 0; i < 10; i++)
         {
             DateMessage tm = new DateMessage();
-            if (i%2==0) tm.authorName = aaron.name;
-            else tm.authorName = colin.name;
+            if (i%2==0) { tm.authorName = aaron.name; tm.authorId = aaron.userId; }
+            else { tm.authorName = colin.name; tm.authorId = colin.userId; }
             tm.text = "I am message " + i + ".";
             tm.sent = new Date(new Date().getTime() + 1000 * i);
             convoAaronColin.messages.add(tm);
