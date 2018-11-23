@@ -48,7 +48,7 @@ public class ConversationsActivity extends AppCompatActivity {
         conversationsRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_conversations);
         conversationsRecyclerView.setHasFixedSize(true);
         conversationsLayoutManager = new LinearLayoutManager(this);
-        conversationsAdapter = new ConversationsAdapter(conversations);
+        conversationsAdapter = new ConversationsAdapter(conversations, this);
         conversationsRecyclerView.setLayoutManager(conversationsLayoutManager);
         conversationsRecyclerView.setAdapter(conversationsAdapter);
     }
