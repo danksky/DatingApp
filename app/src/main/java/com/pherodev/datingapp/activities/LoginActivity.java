@@ -26,7 +26,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -44,7 +43,6 @@ import com.pherodev.datingapp.R;
 import com.pherodev.datingapp.models.Conversation;
 import com.pherodev.datingapp.models.DateMessage;
 import com.pherodev.datingapp.models.Person;
-import com.pherodev.datingapp.models.TextMessage;
 
 import java.util.Date;
 import java.util.UUID;
@@ -431,73 +429,83 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void seedDatabase()
     {
-        Log.d(TAG, "seedDatabase");
         Person aaron = new Person(UUID.randomUUID().toString(), "Aaron Kawalsky", "kawalsky.aaron@gmail.com");
         Person eric = new Person(UUID.randomUUID().toString(), "Eric Kawalsky", "eric.kawalsky@gmail.com");
         Person colin = new Person(UUID.randomUUID().toString(), "Colin Kawalsky", "colin.kawalsky@gmail.com");
         Person barbara = new Person(UUID.randomUUID().toString(), "Barbara Kawalsky", "barbara.kawalsky@gmail.com");
 
         Conversation convoAaronEric = new Conversation();
-        convoAaronEric.conversers.add(aaron.name);
-        convoAaronEric.conversers.add(eric.name);
+        convoAaronEric.conversationId = UUID.randomUUID().toString();
+        convoAaronEric.converserIds.add(aaron.userId);
+        convoAaronEric.converserIds.add(eric.userId);
+        convoAaronEric.converserNames.add(aaron.name);
+        convoAaronEric.converserNames.add(eric.name);
         for (int i = 0; i < 10; i++)
         {
-            TextMessage tm = new TextMessage();
-            if (i%2==0) tm.author = aaron.name;
-            else tm.author = eric.name;
+            DateMessage tm = new DateMessage();
+            if (i%2==0) tm.authorName = aaron.name;
+            else tm.authorName = eric.name;
             tm.text = "I am message " + i + ".";
             tm.sent = new Date(new Date().getTime() + 1000 * i);
             convoAaronEric.messages.add(tm);
         }
-        aaron.conversations.add(convoAaronEric); eric.conversations.add(convoAaronEric);
+        aaron.conversationIds.add(convoAaronEric.getConversationId()); eric.conversationIds.add(convoAaronEric.getConversationId());
 
         Conversation convoAaronBarbara = new Conversation();
-        convoAaronBarbara.conversers.add(aaron.name);
-        convoAaronBarbara.conversers.add(barbara.name);
+        convoAaronBarbara.conversationId = UUID.randomUUID().toString();
+        convoAaronBarbara.converserIds.add(aaron.userId);
+        convoAaronBarbara.converserIds.add(barbara.userId);
+        convoAaronBarbara.converserNames.add(aaron.name);
+        convoAaronBarbara.converserNames.add(barbara.name);
         for (int i = 0; i < 10; i++)
         {
-            TextMessage tm = new TextMessage();
-            if (i%2==0) tm.author = aaron.name;
-            else tm.author = barbara.name;
+            DateMessage tm = new DateMessage();
+            if (i%2==0) tm.authorName = aaron.name;
+            else tm.authorName = barbara.name;
             tm.text = "I am message " + i + ".";
             tm.sent = new Date(new Date().getTime() + 1000 * i);
             convoAaronBarbara.messages.add(tm);
         }
-        aaron.conversations.add(convoAaronBarbara); barbara.conversations.add(convoAaronBarbara);
+        aaron.conversationIds.add(convoAaronBarbara.getConversationId()); barbara.conversationIds.add(convoAaronBarbara.getConversationId());
 
         Conversation convoAaronColin = new Conversation();
-        convoAaronColin.conversers.add(aaron.name);
-        convoAaronColin.conversers.add(colin.name);
+        convoAaronColin.conversationId = UUID.randomUUID().toString();
+        convoAaronColin.converserIds.add(aaron.userId);
+        convoAaronColin.converserIds.add(colin.userId);
+        convoAaronColin.converserNames.add(aaron.name);
+        convoAaronColin.converserNames.add(colin.name);
         for (int i = 0; i < 10; i++)
         {
-            TextMessage tm = new TextMessage();
-            if (i%2==0) tm.author = aaron.name;
-            else tm.author = colin.name;
+            DateMessage tm = new DateMessage();
+            if (i%2==0) tm.authorName = aaron.name;
+            else tm.authorName = colin.name;
             tm.text = "I am message " + i + ".";
             tm.sent = new Date(new Date().getTime() + 1000 * i);
             convoAaronColin.messages.add(tm);
         }
-        aaron.conversations.add(convoAaronColin); colin.conversations.add(convoAaronColin);
-        OnCompleteListener seedCompleteListener = new OnCompleteListener() {
+        aaron.conversationIds.add(convoAaronColin.getConversationId()); colin.conversationIds.add(convoAaronColin.getConversationId());
+
+        OnSuccessListener seedSuccessListener = new OnSuccessListener() {
             @Override
-            public void onComplete(@NonNull Task task) {
-                if (task.isSuccessful()) {
-                    Log.d(TAG, "seed:success");
-                } else {
-                    Log.e(TAG, "seed:" + task.getException());
-                }
+            public void onSuccess(Object o) {
+                Log.d(TAG, "seedDatabase:success");
+
             }
         };
-        OnCanceledListener seedCancelListener = new OnCanceledListener() {
+        OnFailureListener seedFailureListener = new OnFailureListener() {
             @Override
-            public void onCanceled() {
-                Log.d(TAG, "seed:cancel");
+            public void onFailure(@NonNull Exception e) {
+                Log.e(TAG, "seedDatabase:" + e.getMessage());
             }
         };
 
-        firebaseFirestore.collection("users").document(aaron.userId).set(aaron).addOnCompleteListener(seedCompleteListener).addOnCanceledListener(seedCancelListener);
-        firebaseFirestore.collection("users").document(eric.userId).set(eric).addOnCompleteListener(seedCompleteListener).addOnCanceledListener(seedCancelListener);
-        firebaseFirestore.collection("users").document(barbara.userId).set(barbara).addOnCompleteListener(seedCompleteListener).addOnCanceledListener(seedCancelListener);
-        firebaseFirestore.collection("users").document(colin.userId).set(colin).addOnCompleteListener(seedCompleteListener).addOnCanceledListener(seedCancelListener);
+        firebaseFirestore.collection("users").document(aaron.userId).set(aaron).addOnFailureListener(seedFailureListener).addOnSuccessListener(seedSuccessListener);
+        firebaseFirestore.collection("users").document(eric.userId).set(eric).addOnFailureListener(seedFailureListener).addOnSuccessListener(seedSuccessListener);
+        firebaseFirestore.collection("users").document(barbara.userId).set(barbara).addOnFailureListener(seedFailureListener).addOnSuccessListener(seedSuccessListener);
+        firebaseFirestore.collection("users").document(colin.userId).set(colin).addOnFailureListener(seedFailureListener).addOnSuccessListener(seedSuccessListener);
+
+        firebaseFirestore.collection("conversations").document(convoAaronBarbara.getConversationId()).set(convoAaronBarbara).addOnFailureListener(seedFailureListener).addOnSuccessListener(seedSuccessListener);
+        firebaseFirestore.collection("conversations").document(convoAaronColin.getConversationId()).set(convoAaronColin).addOnFailureListener(seedFailureListener).addOnSuccessListener(seedSuccessListener);
+        firebaseFirestore.collection("conversations").document(convoAaronEric.getConversationId()).set(convoAaronEric).addOnFailureListener(seedFailureListener).addOnSuccessListener(seedSuccessListener);
     }
 }

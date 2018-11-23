@@ -4,16 +4,17 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
 import java.util.Date;
 
 public class DateMessage implements Parcelable {
 
-    public String author;
+    public String authorName;
     public Date sent;
+    public String text;
 
-    private static String AUTHOR_KEY = "author";
+    private static String AUTHOR_KEY = "authorName";
     private static String SENT_KEY = "time_sent";
+    private static String TEXT_KEY = "text";
 
     // For Firebase
 
@@ -21,8 +22,9 @@ public class DateMessage implements Parcelable {
 
     private DateMessage(Parcel in) {
         Bundle dateMessageBundle = in.readBundle(getClass().getClassLoader());
-        author = dateMessageBundle.getString(AUTHOR_KEY);
+        authorName = dateMessageBundle.getString(AUTHOR_KEY);
         sent = (Date) dateMessageBundle.getSerializable(SENT_KEY);
+        text = dateMessageBundle.getString(TEXT_KEY);
     }
 
     public static final Parcelable.Creator<DateMessage> CREATOR
@@ -44,17 +46,19 @@ public class DateMessage implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         Bundle dateMessageBundle = new Bundle();
-        dateMessageBundle.putString(AUTHOR_KEY, author);
+        dateMessageBundle.putString(AUTHOR_KEY, authorName);
         dateMessageBundle.putSerializable(SENT_KEY, sent);
+        dateMessageBundle.putString(TEXT_KEY, text);
+
         dest.writeBundle(dateMessageBundle);
     }
 
-    public String getAuthor() {
-        return author;
+    public String getAuthorName() {
+        return authorName;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
     }
 
     public Date getSent() {
@@ -65,4 +69,11 @@ public class DateMessage implements Parcelable {
         this.sent = sent;
     }
 
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
 }

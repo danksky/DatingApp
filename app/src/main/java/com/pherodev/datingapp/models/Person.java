@@ -24,7 +24,7 @@ public class Person implements Parcelable {
     public String name;
     public String email;
     public URL profilePictureURL;
-    public ArrayList<Conversation> conversations;
+    public ArrayList<String> conversationIds;
     public Location location;
 
     // Bundle keys that are just the names of member variables
@@ -47,7 +47,7 @@ public class Person implements Parcelable {
         this.userId = userId;
         this.name = name;
         this.email = email;
-        this.conversations = new ArrayList<>();
+        this.conversationIds = new ArrayList<>();
     }
 
     // For Parcelable
@@ -56,7 +56,7 @@ public class Person implements Parcelable {
         this.userId = personBundle.getString(ID_KEY);
         this.name = personBundle.getString(NAME_KEY);
         this.email = personBundle.getString(EMAIL_KEY);
-        this.conversations = personBundle.getParcelableArrayList(CONVERSATIONS_KEY);
+        this.conversationIds = personBundle.getStringArrayList(CONVERSATIONS_KEY);
     }
 
     public static final Parcelable.Creator<Person> CREATOR
@@ -83,7 +83,7 @@ public class Person implements Parcelable {
         personBundle.putString(NAME_KEY, name);
         personBundle.putString(EMAIL_KEY, email);
         personBundle.putSerializable(PPURL_KEY, profilePictureURL);
-        personBundle.putParcelableArrayList(CONVERSATIONS_KEY, conversations);
+        personBundle.putStringArrayList(CONVERSATIONS_KEY, conversationIds);
         personBundle.putParcelable(LOCATION_KEY, location);
         dest.writeBundle(personBundle);
     }
@@ -120,12 +120,12 @@ public class Person implements Parcelable {
         this.profilePictureURL = profilePictureURL;
     }
 
-    public ArrayList<Conversation> getConversations() {
-        return conversations;
+    public ArrayList<String> getConversationIds() {
+        return conversationIds;
     }
 
-    public void setConversations(ArrayList<Conversation> conversations) {
-        this.conversations = conversations;
+    public void setConversationIds(ArrayList<String> conversationIds) {
+        this.conversationIds = conversationIds;
     }
 
     public Location getLocation() {

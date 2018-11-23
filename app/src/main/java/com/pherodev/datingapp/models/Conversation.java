@@ -10,20 +10,24 @@ public class Conversation implements Parcelable {
 
     public String conversationId;
 
-    public ArrayList<String> conversers;
+    public ArrayList<String> converserIds;
+    public ArrayList<String> converserNames;
     public ArrayList<DateMessage> messages;
 
-    private static String CONVERSERS_KEY = "conversers";
+    private static String CONVERSER_IDS_KEY = "converserIds";
+    private static String CONVERSER_NAMES_KEY = "converserNames";
     private static String MESSAGES_KEY = "messages";
 
     public Conversation() {
-        this.conversers = new ArrayList<>();
+        this.converserIds = new ArrayList<>();
+        this.converserNames = new ArrayList<>();
         this.messages = new ArrayList<>();
     }
 
     private Conversation(Parcel in) {
         Bundle conversationBundle = in.readBundle(getClass().getClassLoader());
-        this.conversers = conversationBundle.getStringArrayList(CONVERSERS_KEY);
+        this.converserIds = conversationBundle.getStringArrayList(CONVERSER_IDS_KEY);
+        this.converserNames = conversationBundle.getStringArrayList(CONVERSER_NAMES_KEY);
         this.messages = conversationBundle.getParcelableArrayList(MESSAGES_KEY);
     }
 
@@ -46,7 +50,8 @@ public class Conversation implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         Bundle conversationBundle = new Bundle();
-        conversationBundle.putStringArrayList(CONVERSERS_KEY, conversers);
+        conversationBundle.putStringArrayList(CONVERSER_IDS_KEY, converserIds);
+        conversationBundle.putStringArrayList(CONVERSER_NAMES_KEY, converserNames);
         conversationBundle.putParcelableArrayList(MESSAGES_KEY, messages);
         dest.writeBundle(conversationBundle);
     }
@@ -59,12 +64,20 @@ public class Conversation implements Parcelable {
         this.conversationId = conversationId;
     }
 
-    public ArrayList<String> getConversers() {
-        return conversers;
+    public ArrayList<String> getConverserIds() {
+        return converserIds;
     }
 
-    public void setConversers(ArrayList<String> conversers) {
-        this.conversers = conversers;
+    public void setConverserIds(ArrayList<String> converserIds) {
+        this.converserIds = converserIds;
+    }
+
+    public ArrayList<String> getConverserNames() {
+        return converserNames;
+    }
+
+    public void setConverserNames(ArrayList<String> converserNames) {
+        this.converserNames = converserNames;
     }
 
     public ArrayList<DateMessage> getMessages() {

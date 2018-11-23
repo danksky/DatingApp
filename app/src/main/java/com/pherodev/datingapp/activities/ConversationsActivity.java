@@ -12,18 +12,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.pherodev.datingapp.R;
 import com.pherodev.datingapp.adapters.ConversationsAdapter;
 import com.pherodev.datingapp.models.Conversation;
-import com.pherodev.datingapp.models.DateMessage;
 import com.pherodev.datingapp.models.Person;
-import com.pherodev.datingapp.models.TextMessage;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class ConversationsActivity extends AppCompatActivity {
 
@@ -36,6 +30,7 @@ public class ConversationsActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager conversationsLayoutManager;
     private ConversationsAdapter conversationsAdapter;
 
+    private ArrayList<String> conversationsIds;
     private ArrayList<Conversation> conversations;
 
     @Override
@@ -49,6 +44,7 @@ public class ConversationsActivity extends AppCompatActivity {
         conversations = new ArrayList<>();
         populateConversations();
 
+
         conversationsRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_conversations);
         conversationsRecyclerView.setHasFixedSize(true);
         conversationsLayoutManager = new LinearLayoutManager(this);
@@ -57,9 +53,26 @@ public class ConversationsActivity extends AppCompatActivity {
         conversationsRecyclerView.setAdapter(conversationsAdapter);
     }
 
+    /**
+    private void populateConversationIds() {
+        if (getIntent() != null || getIntent().getExtras() != null) {
+            Bundle personBundle = getIntent().getBundleExtra(PERSON_KEY);
+            conversationsIds = ((Person) personBundle.getParcelable(PERSON_KEY)).conversationIds;
+        } else {
+            // TODO: Figure out error report submission.
+            String error = "Intent (" + (getIntent() == null ? "null" : "non-null") + ")" +
+                    "\t" +
+                    "Extras (" + (getIntent() == null || getIntent().getExtras() == null ? "null" : "non-null") + ")";
+            // TODO: Extend Exception for this?
+            Log.e(TAG, error);
+            Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+        }
+    }
+    */
+
     private void populateConversations() {
         // TODO: Replace aaronId with firebaseAuth.getCurrentUser.getUid()
-        String aaronId = "fc85b6d3-5b55-46d2-8578-31f2bdba29f0";
+        String aaronId = "31be09d3-5bed-488d-9004-99925f4f1776";
         // TODO: Implement conversations collection, turning Person's conversations into an array of String conversationIds
         firebaseFirestore.collection("users").document(aaronId).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -67,10 +80,13 @@ public class ConversationsActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "fetchConversations:success");
-                            ArrayList<Conversation> convoList = task.getResult().toObject(Person.class).conversations;
+                            // TODO: Add null checker
+                            conversationsIds = task.getResult().toObject(Person.class).conversationIds;
                             conversations.clear();
-                            conversations.addAll(convoList);
-                            conversationsAdapter.notifyDataSetChanged();
+                            for (int i = 0; i < conversationsIds.size(); i++)
+                                conversations.add(null);
+                            for (int i = 0; i < conversationsIds.size(); i++)
+                                populateConversation(i, conversationsIds.get(i));
                         } else {
                             Log.e(TAG, "fetchConversations:"+task.getException().getMessage());
                         }
@@ -78,6 +94,23 @@ public class ConversationsActivity extends AppCompatActivity {
                 });
 
         // TODO: Implement local cache of messages
+    }
+
+    private void populateConversation(final int index, String conversationId) {
+        firebaseFirestore.collection("conversations").document(conversationId).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "populateConversation:success");
+                            Conversation conversation = task.getResult().toObject(Conversation.class);
+                            conversations.set(index, conversation);
+                            conversationsAdapter.notifyDataSetChanged();
+                        } else {
+                            Log.e(TAG, "populateConversation:" + task.getException().getMessage());
+                        }
+                    }
+                });
     }
 
 }

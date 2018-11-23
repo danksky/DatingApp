@@ -1,6 +1,5 @@
 package com.pherodev.datingapp.adapters;
 
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +10,6 @@ import android.widget.TextView;
 import com.pherodev.datingapp.R;
 import com.pherodev.datingapp.models.Conversation;
 import com.pherodev.datingapp.models.DateMessage;
-import com.pherodev.datingapp.models.TextMessage;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -33,11 +30,11 @@ public class ConversationsAdapter extends RecyclerView.Adapter<ConversationsAdap
 
     @Override
     public void onBindViewHolder(ConversationViewHolder holder, int position) {
-        holder.correspondentTextView.setText(conversations.get(position).conversers.get(1));
+        holder.correspondentTextView.setText(conversations.get(position).converserNames.get(1));
         ArrayList<DateMessage> messages = conversations.get(position).messages;
         holder.previewTextView.setText(messages.get(messages.size()-1).sent.toString());
         // TODO: Implement profile icons
-//        Picasso.get().load(conversations.get(position).conversers.get(0).profilePictureURL.toString())
+//        Picasso.get().load(conversations.get(position).converserIds.get(0).profilePictureURL.toString())
 //                .error(R.drawable.ic_launcher_background)
 //                .resize(45, 45)
 //                .into(holder.correspondentImageView);
@@ -60,5 +57,6 @@ public class ConversationsAdapter extends RecyclerView.Adapter<ConversationsAdap
             correspondentImageView = (ImageView) itemView.findViewById(R.id.image_view_conversation_item_correspondent);
         }
     }
+
 
 }

@@ -21,7 +21,6 @@
                 <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             </intent-filter>
         </activity>
-        <activity android:name=".activities.UserProfileActivity" />
         <activity android:name=".activities.MapActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
